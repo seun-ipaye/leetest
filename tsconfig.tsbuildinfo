@@ -1,0 +1,1 @@
+{"root":["./src/background/service-worker.ts","./src/sidepanel/app.tsx","./src/sidepanel/main.tsx","./vite.config.ts","./manifest.config.ts"],"version":"6.0.3"}
