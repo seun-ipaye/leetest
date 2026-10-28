@@ -49,6 +49,18 @@ export function pickNext(
   return pool.length ? pool[Math.floor(rng() * pool.length)] : null;
 }
 
+/** Free problems per tag, most common first, for the topic picker. */
+export function topicCounts(problems: Problem[]): { topic: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const p of problems) {
+    if (p.paidOnly) continue;
+    for (const t of p.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+  }
+  return [...counts]
+    .map(([topic, count]) => ({ topic, count }))
+    .sort((a, b) => b.count - a.count || a.topic.localeCompare(b.topic));
+}
+
 /** Every tag in the bank, sorted, for the topic picker. */
 export function allTopics(problems: Problem[]): string[] {
   return [...new Set(problems.flatMap((p) => p.tags))].sort();
