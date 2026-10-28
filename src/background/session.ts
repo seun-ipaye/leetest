@@ -1,5 +1,5 @@
 import { OA_QUESTION_COUNT } from "../shared/constants";
-import type { Outcome, Problem, Session, SessionConfig } from "../shared/types";
+import type { Outcome, Problem, Session, SessionConfig, Submission } from "../shared/types";
 import { pickNext, pickSet, type Rng } from "./picker";
 
 // Pure session transitions. The service worker handles storage and tabs around these.
@@ -119,7 +119,43 @@ export function deadlineFor(session: Session): number | null {
   return session.currentStartedAt + session.config.timeLimits[problem.difficulty] * 60_000;
 }
 
-/** Outcome when moving on by choice: accepted if any submission was, otherwise failed. */
+/** Outcome when moving on: accepted if any submission was, failed if none were, skipped if none made. */
 export function outcomeFromSubmissions(session: Session): Outcome {
+  if (session.currentSubmissions.length === 0) return "skipped";
   return session.currentSubmissions.some((s) => s.verdict === "Accepted") ? "accepted" : "failed";
+}
+
+// Mode rules.
+// Practice: Next unlocks only after an Accepted; Skip is the way out otherwise.
+// OA: any submit moves straight on, right or wrong.
+
+export class NextLockedError extends Error {
+  constructor() {
+    super("Get an Accepted submission first, or skip this one.");
+  }
+}
+
+export function canGoNext(session: Session): boolean {
+  if (session.status !== "active") return false;
+  return session.config.mode === "oa" || outcomeFromSubmissions(session) === "accepted";
+}
+
+/** Moves on by pressing Next. Throws in practice until the problem is Accepted. */
+export function next(session: Session, problems: Problem[], now: number, rng?: Rng): Session {
+  if (!canGoNext(session)) throw new NextLockedError();
+  return advance(session, outcomeFromSubmissions(session), problems, now, rng);
+}
+
+/** Records a verdict on the current problem. In OA this also moves to the next one. */
+export function applySubmission(
+  session: Session,
+  submission: Submission,
+  problems: Problem[],
+  now: number,
+  rng?: Rng,
+): Session {
+  if (currentProblem(session)?.slug !== submission.slug) return session;
+  const updated = { ...session, currentSubmissions: [...session.currentSubmissions, submission] };
+  if (updated.config.mode !== "oa") return updated;
+  return advance(updated, outcomeFromSubmissions(updated), problems, now, rng);
 }

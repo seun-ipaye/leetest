@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_TIME_LIMITS, OA_QUESTION_COUNT } from "../shared/constants";
-import type { Problem, SessionConfig } from "../shared/types";
+import type { Problem, SessionConfig, Submission } from "../shared/types";
 import {
   advance,
   createSession,
@@ -9,6 +9,10 @@ import {
   endSession,
   NoProblemsError,
   outcomeFromSubmissions,
+  next,
+  applySubmission,
+  canGoNext,
+  NextLockedError,
 } from "./session";
 
 const bank: Problem[] = [1, 2, 3, 4, 5].map((id) => ({
@@ -104,5 +108,54 @@ describe("deadlineFor", () => {
   it("is null in practice and once finished", () => {
     expect(deadlineFor(createSession(practice, 1, bank, 0))).toBeNull();
     expect(deadlineFor(endSession(createSession(oa, 1, bank, 0), 1))).toBeNull();
+  });
+});
+
+describe("mode rules", () => {
+  const sub = (slug: string, verdict: Submission["verdict"]): Submission => ({
+    slug,
+    verdict,
+    submittedAt: 1,
+  });
+
+  it("practice locks Next until an Accepted", () => {
+    let s = createSession(practice, 1, bank, 0);
+    expect(() => next(s, bank, 1)).toThrow(NextLockedError);
+
+    s = applySubmission(s, sub(s.queue[0].slug, "Wrong Answer"), bank, 1);
+    expect(canGoNext(s)).toBe(false);
+    expect(s.index).toBe(0);
+
+    s = applySubmission(s, sub(s.queue[0].slug, "Accepted"), bank, 2);
+    expect(canGoNext(s)).toBe(true);
+    expect(s.index).toBe(0); // practice never auto-advances
+
+    s = next(s, bank, 3);
+    expect(s.results[0]).toMatchObject({ outcome: "accepted" });
+    expect(s.results[0].submissions).toHaveLength(2);
+  });
+
+  it("practice still allows skipping", () => {
+    const s = advance(createSession(practice, 1, bank, 0), "skipped", bank, 1);
+    expect(s.results[0].outcome).toBe("skipped");
+  });
+
+  it("OA moves on after any submission, right or wrong", () => {
+    let s = createSession(oa, 1, bank, 0);
+    s = applySubmission(s, sub(s.queue[0].slug, "Wrong Answer"), bank, 1);
+    expect(s.index).toBe(1);
+    s = applySubmission(s, sub(s.queue[1].slug, "Accepted"), bank, 2);
+    expect(s.index).toBe(2);
+    expect(s.results.map((r) => r.outcome)).toEqual(["failed", "accepted"]);
+  });
+
+  it("OA Next without a submission counts as skipped", () => {
+    const s = next(createSession(oa, 1, bank, 0), bank, 1);
+    expect(s.results[0].outcome).toBe("skipped");
+  });
+
+  it("ignores submissions for a different problem", () => {
+    const s = createSession(oa, 1, bank, 0);
+    expect(applySubmission(s, sub("not-this-one", "Accepted"), bank, 1)).toBe(s);
   });
 });

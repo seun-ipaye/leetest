@@ -9,8 +9,10 @@ import {
   currentProblem,
   deadlineFor,
   endSession,
-  outcomeFromSubmissions,
+  next,
+  applySubmission,
 } from "./session";
+import { CHECK_URL_PATTERN, parseCheck, slugFromUrl, submissionIdFromUrl } from "./submissions";
 
 // Toolbar icon opens the side panel.
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
@@ -41,28 +43,47 @@ async function handle(msg: Request): Promise<RequestMap[Request["type"]]["respon
       const session = createSession(msg.payload, tab, PROBLEMS, Date.now());
       return commit(session);
     }
-    case "NEXT_PROBLEM": {
-      const session = await requireActive();
-      return commit(advance(session, outcomeFromSubmissions(session), PROBLEMS, Date.now()));
-    }
+    case "NEXT_PROBLEM":
+      return commit(next(await requireActive(), PROBLEMS, Date.now()));
     case "SKIP_PROBLEM":
       return commit(advance(await requireActive(), "skipped", PROBLEMS, Date.now()));
     case "END_SESSION":
       return commit(endSession(await requireActive(), Date.now()));
     case "GET_SESSION":
       return loadSession();
-    case "SUBMISSION": {
-      // Recorded only for now; mode rules (auto-advance, unlock Next) come later.
-      const session = await loadSession();
-      const problem = session && currentProblem(session);
-      if (!session || !problem || problem.slug !== msg.payload.slug) return session;
-      const submission = { ...msg.payload, submittedAt: Date.now() };
-      return saveSession({
-        ...session,
-        currentSubmissions: [...session.currentSubmissions, submission],
-      }).then(loadSession);
-    }
   }
+}
+
+// Submissions. When the session's tab polls LeetCode's judge, we re-read the same
+// check URL ourselves (the browser sends the user's cookies) to see the verdict.
+const seenSubmissions = new Set<string>();
+
+chrome.webRequest.onCompleted.addListener(
+  (details) => {
+    const id = submissionIdFromUrl(details.url);
+    if (!id || details.tabId < 0 || seenSubmissions.has(id)) return;
+    serialize(() => checkSubmission(id, details.url, details.tabId)).catch((err) =>
+      console.error("[LeetTest] submission check failed:", err),
+    );
+  },
+  { urls: [CHECK_URL_PATTERN], types: ["xmlhttprequest"] },
+);
+
+async function checkSubmission(id: string, url: string, tabId: number): Promise<void> {
+  const session = await loadSession();
+  const problem = session && currentProblem(session);
+  if (!session || !problem || session.tabId !== tabId || seenSubmissions.has(id)) return;
+
+  const tab = await chrome.tabs.get(tabId);
+  if (slugFromUrl(tab.url) !== problem.slug) return;
+
+  const res = await fetch(url, { credentials: "include" });
+  if (!res.ok) return;
+  const submission = parseCheck(await res.json(), problem.slug, Date.now());
+  if (!submission) return; // still judging; the page's next poll triggers us again
+
+  seenSubmissions.add(id);
+  await commit(applySubmission(session, submission, PROBLEMS, Date.now()));
 }
 
 /** Saves the session, archives it if finished, and points the tab at the current problem. */

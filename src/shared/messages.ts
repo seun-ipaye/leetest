@@ -1,8 +1,8 @@
-import type { Session, SessionConfig, Submission } from "./types";
+import type { Session, SessionConfig } from "./types";
 
 /**
  * Requests sent to the service worker, keyed by type, with the response each one gets.
- * Senders: side panel (session control) and content script (submissions).
+ * Sent by the side panel. Submissions are picked up by the service worker itself.
  * To react to session changes, use watchSession() from storage.ts.
  */
 export interface RequestMap {
@@ -11,7 +11,6 @@ export interface RequestMap {
   SKIP_PROBLEM: { payload: undefined; response: Session };
   END_SESSION: { payload: undefined; response: Session };
   GET_SESSION: { payload: undefined; response: Session | null };
-  SUBMISSION: { payload: Omit<Submission, "submittedAt">; response: Session | null };
 }
 
 export type RequestType = keyof RequestMap;

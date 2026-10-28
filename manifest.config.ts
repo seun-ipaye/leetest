@@ -6,7 +6,7 @@ export default defineManifest({
   name: "LeetTest",
   version: pkg.version,
   description: "Randomized, timed LeetCode practice and OA simulation.",
-  permissions: ["sidePanel", "storage", "tabs", "alarms"],
+  permissions: ["sidePanel", "storage", "tabs", "alarms", "webRequest"],
   host_permissions: ["https://leetcode.com/*"],
   background: { service_worker: "src/background/service-worker.ts", type: "module" },
   side_panel: { default_path: "src/sidepanel/index.html" },
