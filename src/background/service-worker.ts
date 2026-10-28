@@ -7,6 +7,7 @@ import {
   advance,
   createSession,
   currentProblem,
+  deadlineFor,
   endSession,
   outcomeFromSubmissions,
 } from "./session";
@@ -72,9 +73,33 @@ async function commit(session: Session): Promise<Session> {
 
   const problem = currentProblem(session);
   const moved = previous?.id !== session.id || previous.index !== session.index;
+  if (moved || session.status === "finished") await scheduleDeadline(session);
   if (problem && moved) await openInTab(session.tabId, problem.slug);
   return session;
 }
+
+// OA timer. One alarm at a time, named after the session and question it belongs to,
+// so an alarm that fires late for a question already left is ignored.
+const ALARM_PREFIX = "oa-deadline:";
+const alarmName = (session: Session) => `${ALARM_PREFIX}${session.id}:${session.index}`;
+
+async function scheduleDeadline(session: Session): Promise<void> {
+  const existing = await chrome.alarms.getAll();
+  await Promise.all(
+    existing.filter((a) => a.name.startsWith(ALARM_PREFIX)).map((a) => chrome.alarms.clear(a.name)),
+  );
+  const when = deadlineFor(session);
+  if (when !== null) await chrome.alarms.create(alarmName(session), { when });
+}
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (!alarm.name.startsWith(ALARM_PREFIX)) return;
+  serialize(async () => {
+    const session = await loadSession();
+    if (session?.status !== "active" || alarm.name !== alarmName(session)) return;
+    await commit(advance(session, "timed-out", PROBLEMS, Date.now()));
+  }).catch((err) => console.error("[LeetTest] deadline failed:", err));
+});
 
 async function requireActive(): Promise<Session> {
   const session = await loadSession();

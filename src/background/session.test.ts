@@ -5,6 +5,7 @@ import {
   advance,
   createSession,
   currentProblem,
+  deadlineFor,
   endSession,
   NoProblemsError,
   outcomeFromSubmissions,
@@ -88,5 +89,20 @@ describe("endSession", () => {
   it("is a no-op on a finished session", () => {
     const s = endSession(createSession(practice, 1, bank, 0), 1);
     expect(endSession(s, 2)).toBe(s);
+  });
+});
+
+describe("deadlineFor", () => {
+  it("uses the current problem's difficulty limit in OA", () => {
+    const limits = { Easy: 10, Medium: 20, Hard: 30 };
+    let s = createSession({ ...oa, timeLimits: limits }, 1, bank, 1_000);
+    expect(deadlineFor(s)).toBe(1_000 + 20 * 60_000);
+    s = advance(s, "failed", bank, 5_000);
+    expect(deadlineFor(s)).toBe(5_000 + 20 * 60_000);
+  });
+
+  it("is null in practice and once finished", () => {
+    expect(deadlineFor(createSession(practice, 1, bank, 0))).toBeNull();
+    expect(deadlineFor(endSession(createSession(oa, 1, bank, 0), 1))).toBeNull();
   });
 });

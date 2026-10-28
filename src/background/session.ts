@@ -112,6 +112,13 @@ export function endSession(session: Session, now: number): Session {
   return finish(next, now);
 }
 
+/** When the current OA problem runs out of time (epoch ms). Null in practice or when not active. */
+export function deadlineFor(session: Session): number | null {
+  const problem = currentProblem(session);
+  if (!problem || session.config.mode !== "oa") return null;
+  return session.currentStartedAt + session.config.timeLimits[problem.difficulty] * 60_000;
+}
+
 /** Outcome when moving on by choice: accepted if any submission was, otherwise failed. */
 export function outcomeFromSubmissions(session: Session): Outcome {
   return session.currentSubmissions.some((s) => s.verdict === "Accepted") ? "accepted" : "failed";
