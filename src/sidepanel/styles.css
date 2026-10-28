@@ -201,3 +201,117 @@ input[type="number"] {
 footer p {
   margin: 0 0 8px;
 }
+
+.ok {
+  color: var(--easy);
+}
+
+.progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.dots span.done {
+  background: var(--muted);
+}
+
+.dots span.now {
+  background: var(--accent);
+}
+
+.clock {
+  font-size: 40px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  margin: 8px 0 16px;
+}
+
+.clock.low {
+  color: var(--error);
+}
+
+.problem {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  margin-bottom: 16px;
+}
+
+.problem .title {
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text);
+  margin: 8px 0 4px;
+}
+
+.tags {
+  font-size: 12px;
+  margin: 0 0 8px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.easy {
+  color: var(--easy);
+}
+.badge.medium {
+  color: var(--medium);
+}
+.badge.hard {
+  color: var(--hard);
+}
+
+.verdict p {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.verdict .hint {
+  font-weight: normal;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.actions .primary {
+  flex: 2;
+}
+
+.secondary {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
