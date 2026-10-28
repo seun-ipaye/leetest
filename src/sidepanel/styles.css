@@ -315,3 +315,144 @@ footer p {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.app-header h1 {
+  margin: 0;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 8px 0 20px;
+}
+
+.score .big {
+  font-size: 40px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 0 8px 8px 0;
+  background: var(--surface);
+}
+
+.result.accepted {
+  border-left-color: var(--easy);
+}
+.result.failed,
+.result.timed-out {
+  border-left-color: var(--hard);
+}
+.result.skipped {
+  border-left-color: var(--muted);
+}
+
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.result-head a {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.result-head a:hover {
+  text-decoration: underline;
+}
+
+.result-meta {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.outcome.accepted {
+  color: var(--easy);
+}
+.outcome.failed,
+.outcome.timed-out {
+  color: var(--hard);
+}
+
+.back {
+  margin-bottom: 16px;
+}
+
+.danger {
+  color: var(--error);
+  margin-top: 12px;
+}
+
+.trend {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 60px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.trend .bar {
+  flex: 1;
+  max-width: 24px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+.weak,
+.sessions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.weak li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.session-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.session-row:hover {
+  color: var(--accent);
+}
