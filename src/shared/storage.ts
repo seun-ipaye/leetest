@@ -1,4 +1,4 @@
-import { DEFAULT_TIME_LIMITS } from "./constants";
+import { DEFAULT_OA_QUESTION_COUNT, DEFAULT_TIME_LIMITS } from "./constants";
 import type { Session, Settings } from "./types";
 
 /** Everything persisted in chrome.storage.local, by key. */
@@ -10,7 +10,7 @@ interface Schema {
 
 const DEFAULTS: Schema = {
   session: null,
-  settings: { timeLimits: DEFAULT_TIME_LIMITS },
+  settings: { timeLimits: DEFAULT_TIME_LIMITS, oaQuestionCount: DEFAULT_OA_QUESTION_COUNT },
   history: [],
 };
 
@@ -34,7 +34,11 @@ export const clearSession = () => set("session", null);
 export async function loadSettings(): Promise<Settings> {
   const settings = await get("settings");
   // Merge so limits added later still get a default.
-  return { ...settings, timeLimits: { ...DEFAULT_TIME_LIMITS, ...settings.timeLimits } };
+  return {
+    ...settings,
+    oaQuestionCount: settings.oaQuestionCount ?? DEFAULT_OA_QUESTION_COUNT,
+    timeLimits: { ...DEFAULT_TIME_LIMITS, ...settings.timeLimits },
+  };
 }
 
 export async function updateSettings(patch: Partial<Settings>): Promise<Settings> {

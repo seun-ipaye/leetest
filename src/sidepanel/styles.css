@@ -456,3 +456,23 @@ footer p {
 .session-row:hover {
   color: var(--accent);
 }
+
+.center {
+  text-align: center;
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.banner .link {
+  white-space: nowrap;
+}

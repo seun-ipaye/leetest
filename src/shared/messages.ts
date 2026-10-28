@@ -11,6 +11,8 @@ export interface RequestMap {
   SKIP_PROBLEM: { payload: undefined; response: Session };
   END_SESSION: { payload: undefined; response: Session };
   GET_SESSION: { payload: undefined; response: Session | null };
+  /** Points the session's tab back at the current problem, reopening it if closed. */
+  REOPEN_PROBLEM: { payload: undefined; response: Session };
 }
 
 export type RequestType = keyof RequestMap;

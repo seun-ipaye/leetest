@@ -51,6 +51,12 @@ async function handle(msg: Request): Promise<RequestMap[Request["type"]]["respon
       return commit(endSession(await requireActive(), Date.now()));
     case "GET_SESSION":
       return loadSession();
+    case "REOPEN_PROBLEM": {
+      const session = await requireActive();
+      const problem = currentProblem(session);
+      if (problem) await openInTab(session.tabId, problem.slug);
+      return (await loadSession()) ?? session;
+    }
   }
 }
 

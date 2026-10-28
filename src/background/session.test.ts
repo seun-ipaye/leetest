@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_TIME_LIMITS, OA_QUESTION_COUNT } from "../shared/constants";
+import { DEFAULT_TIME_LIMITS } from "../shared/constants";
 import type { Problem, SessionConfig, Submission } from "../shared/types";
 import {
   advance,
@@ -25,13 +25,23 @@ const bank: Problem[] = [1, 2, 3, 4, 5].map((id) => ({
 }));
 
 const practice: SessionConfig = { mode: "practice", topics: [], difficulties: [] };
-const oa: SessionConfig = { ...practice, mode: "oa", timeLimits: DEFAULT_TIME_LIMITS };
+const oa: SessionConfig = {
+  ...practice,
+  mode: "oa",
+  questionCount: 3,
+  timeLimits: DEFAULT_TIME_LIMITS,
+};
 
 describe("createSession", () => {
   it("pre-picks the full set for OA", () => {
     const s = createSession(oa, 1, bank, 0);
-    expect(s.queue).toHaveLength(OA_QUESTION_COUNT);
+    expect(s.queue).toHaveLength(3);
     expect(currentProblem(s)).toBe(s.queue[0]);
+  });
+
+  it("uses the configured OA question count, capped by the pool", () => {
+    expect(createSession({ ...oa, questionCount: 2 }, 1, bank, 0).queue).toHaveLength(2);
+    expect(createSession({ ...oa, questionCount: 10 }, 1, bank, 0).queue).toHaveLength(bank.length);
   });
 
   it("picks just one problem for practice", () => {
@@ -48,7 +58,7 @@ describe("createSession", () => {
 describe("advance", () => {
   it("OA walks the queue, then finishes with a result per problem", () => {
     let s = createSession(oa, 1, bank, 0);
-    for (let i = 0; i < OA_QUESTION_COUNT; i++) s = advance(s, "failed", bank, i + 1);
+    for (let i = 0; i < 3; i++) s = advance(s, "failed", bank, i + 1);
     expect(s.status).toBe("finished");
     expect(s.results.map((r) => r.problem)).toEqual(s.queue);
     expect(currentProblem(s)).toBeNull();

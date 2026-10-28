@@ -79,6 +79,10 @@ describe("settings", () => {
     expect((await loadSettings()).timeLimits).toEqual(DEFAULT_TIME_LIMITS);
   });
 
+  it("defaults to 3 OA questions", async () => {
+    expect((await loadSettings()).oaQuestionCount).toBe(3);
+  });
+
   it("persists custom limits", async () => {
     await updateSettings({ timeLimits: { Easy: 5, Medium: 15, Hard: 45 } });
     expect((await loadSettings()).timeLimits).toEqual({ Easy: 5, Medium: 15, Hard: 45 });

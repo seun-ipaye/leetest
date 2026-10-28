@@ -23,9 +23,10 @@ export interface PracticeConfig extends BaseConfig {
   mode: "practice";
 }
 
-/** OA: fixed question count, timed, any submit moves on, results shown at the end. */
+/** OA: set number of questions, timed, any submit moves on, results shown at the end. */
 export interface OAConfig extends BaseConfig {
   mode: "oa";
+  questionCount: number;
   timeLimits: TimeLimits;
 }
 
@@ -79,5 +80,6 @@ export interface Session {
 /** User settings that persist between sessions. */
 export interface Settings {
   timeLimits: TimeLimits;
+  oaQuestionCount: number;
   lastConfig?: SessionConfig;
 }

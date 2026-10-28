@@ -1,4 +1,3 @@
-import { OA_QUESTION_COUNT } from "../shared/constants";
 import type { Outcome, Problem, Session, SessionConfig, Submission } from "../shared/types";
 import { pickNext, pickSet, type Rng } from "./picker";
 
@@ -19,7 +18,7 @@ export function createSession(
 ): Session {
   const queue =
     config.mode === "oa"
-      ? pickSet(problems, config, OA_QUESTION_COUNT, rng)
+      ? pickSet(problems, config, config.questionCount, rng)
       : [pickNext(problems, config, new Set(), rng)].filter((p): p is Problem => p !== null);
   if (queue.length === 0) throw new NoProblemsError();
 
