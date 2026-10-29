@@ -16,8 +16,12 @@ export default function TopicPicker({ topics, selected, onChange }: Props) {
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     const matches = q ? topics.filter((t) => t.topic.toLowerCase().includes(q)) : topics;
-    return q || expanded ? matches : matches.slice(0, COLLAPSED_COUNT);
-  }, [topics, query, expanded]);
+    if (q || expanded) return matches;
+    // Collapsed: the most common topics, plus any selected ones so selections never vanish.
+    const top = matches.slice(0, COLLAPSED_COUNT);
+    const hiddenSelected = matches.slice(COLLAPSED_COUNT).filter((t) => selected.includes(t.topic));
+    return [...hiddenSelected, ...top];
+  }, [topics, query, expanded, selected]);
 
   const toggle = (topic: string) =>
     onChange(selected.includes(topic) ? selected.filter((t) => t !== topic) : [...selected, topic]);
