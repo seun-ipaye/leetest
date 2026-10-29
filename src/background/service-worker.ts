@@ -84,8 +84,9 @@ async function checkSubmission(id: string, url: string, tabId: number): Promise<
   if (slugFromUrl(tab.url) !== problem.slug) return;
 
   const res = await fetch(url, { credentials: "include" });
-  if (!res.ok) return;
-  const submission = parseCheck(await res.json(), problem.slug, Date.now());
+  const body = await res.json().catch(() => null);
+  if (!res.ok || !body) return;
+  const submission = parseCheck(body, problem.slug, Date.now());
   if (!submission) return; // still judging; the page's next poll triggers us again
 
   seenSubmissions.add(id);

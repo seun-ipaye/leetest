@@ -34,6 +34,7 @@
 
 * {
   box-sizing: border-box;
+  border-radius: 0;
 }
 
 body {
@@ -73,10 +74,11 @@ input {
 input[type="search"],
 input[type="number"] {
   width: 100%;
-  padding: 6px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  outline: none;
 }
 
 .muted {
@@ -101,57 +103,53 @@ input[type="number"] {
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 6px 16px;
   margin-top: 8px;
 }
 
 .chip {
-  padding: 4px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--surface);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
   cursor: pointer;
 }
 
+.chip:hover {
+  color: var(--text);
+}
+
 .chip.on {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-text);
+  color: var(--text);
+  font-weight: 600;
 }
 
-.chip.on .muted {
-  color: inherit;
-  opacity: 0.7;
-}
-
-.chip.easy:not(.on) {
+.chip.easy.on {
   color: var(--easy);
 }
-.chip.medium:not(.on) {
+.chip.medium.on {
   color: var(--medium);
 }
-.chip.hard:not(.on) {
+.chip.hard.on {
   color: var(--hard);
 }
 
 .segmented {
   display: flex;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
+  gap: 20px;
 }
 
 .segmented button {
-  flex: 1;
-  padding: 8px;
+  padding: 0;
   border: none;
-  background: var(--surface);
+  background: none;
+  font-size: 18px;
+  color: var(--muted);
   cursor: pointer;
 }
 
 .segmented button.on {
-  background: var(--accent);
-  color: var(--accent-text);
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -159,15 +157,13 @@ input[type="number"] {
   padding: 0;
   border: none;
   background: none;
-  color: var(--accent);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .advanced {
   margin-bottom: 20px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  color: var(--muted);
 }
 
 .advanced summary {
@@ -186,9 +182,8 @@ input[type="number"] {
   width: 100%;
   padding: 10px;
   border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--text);
+  color: var(--bg);
   font-weight: 600;
   cursor: pointer;
 }
@@ -222,7 +217,6 @@ footer p {
 .dots span {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
   background: var(--border);
 }
 
@@ -247,10 +241,6 @@ footer p {
 }
 
 .problem {
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
   margin-bottom: 16px;
 }
 
@@ -294,20 +284,20 @@ footer p {
 
 .actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   margin-top: 16px;
 }
 
-.actions .primary {
-  flex: 2;
+.actions button {
+  flex: none;
 }
 
 .secondary {
   flex: 1;
   padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
+  background: none;
   cursor: pointer;
 }
 
@@ -357,7 +347,6 @@ footer p {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-left-width: 3px;
-  border-radius: 0 8px 8px 0;
   background: var(--surface);
 }
 
@@ -417,14 +406,12 @@ footer p {
   height: 60px;
   padding: 4px;
   border: 1px solid var(--border);
-  border-radius: 8px;
 }
 
 .trend .bar {
   flex: 1;
   max-width: 24px;
   background: var(--accent);
-  border-radius: 2px 2px 0 0;
 }
 
 .weak,
@@ -469,7 +456,6 @@ footer p {
   padding: 8px 12px;
   margin-bottom: 12px;
   border: 1px solid var(--accent);
-  border-radius: 8px;
   font-size: 13px;
 }
 

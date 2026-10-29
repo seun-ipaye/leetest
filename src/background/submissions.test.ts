@@ -8,6 +8,12 @@ describe("submissionIdFromUrl", () => {
     );
   });
 
+  it("reads the versioned check URL", () => {
+    expect(
+      submissionIdFromUrl("https://leetcode.com/submissions/detail/2184346925/v2/check/"),
+    ).toBe("2184346925");
+  });
+
   it("ignores Run requests", () => {
     expect(
       submissionIdFromUrl("https://leetcode.com/submissions/detail/runcode_17_abc/check/"),
@@ -53,6 +59,16 @@ describe("parseCheck", () => {
     expect(
       parseCheck({ state: "SUCCESS", status_msg: "Wrong Answer", status_runtime: "" }, "x", 0),
     ).toMatchObject({ verdict: "Wrong Answer", runtime: undefined });
+  });
+
+  it('drops "N/A" stats', () => {
+    const body = {
+      state: "SUCCESS",
+      status_msg: "Runtime Error",
+      status_runtime: "N/A",
+      status_memory: "N/A",
+    };
+    expect(parseCheck(body, "x", 0)).toMatchObject({ runtime: undefined, memory: undefined });
   });
 
   it("ignores verdicts it doesn't know", () => {

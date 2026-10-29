@@ -80,7 +80,6 @@ export default function Setup() {
       }}
     >
       <section>
-        <h2>Mode</h2>
         <div className="segmented" role="radiogroup">
           {(["practice", "oa"] as const).map((m) => (
             <button
@@ -91,19 +90,13 @@ export default function Setup() {
               className={mode === m ? "on" : ""}
               onClick={() => setMode(m)}
             >
-              {m === "practice" ? "Practice" : "OA"}
+              {m === "practice" ? "Practice mode" : "OA mode"}
             </button>
           ))}
         </div>
-        <p className="muted hint">
-          {mode === "practice"
-            ? "Untimed and endless. Get Accepted to unlock Next, or skip."
-            : `${questionCount} timed question${questionCount === 1 ? "" : "s"}. Submitting moves on; results at the end.`}
-        </p>
       </section>
 
       <section>
-        <h2>Difficulty</h2>
         <div className="chips">
           {DIFFICULTIES.map((d) => (
             <button
@@ -117,13 +110,10 @@ export default function Setup() {
             </button>
           ))}
         </div>
-        {difficulties.length === 0 && <p className="muted hint">None selected means any.</p>}
       </section>
 
       <section>
-        <h2>Topics</h2>
         <TopicPicker topics={TOPICS} selected={topics} onChange={setTopics} />
-        {topics.length === 0 && <p className="muted hint">None selected means any.</p>}
       </section>
 
       {mode === "oa" && (
@@ -162,12 +152,6 @@ export default function Setup() {
       )}
 
       <footer>
-        <p className="muted">
-          {matching.toLocaleString()} problem{matching === 1 ? "" : "s"} match
-          {mode === "oa" && matching > 0 && matching < questionCount
-            ? ` (OA will have ${matching})`
-            : ""}
-        </p>
         {error && <p className="error">{error}</p>}
         <button type="submit" className="primary" disabled={starting || matching === 0}>
           {starting ? "Starting…" : "Start"}

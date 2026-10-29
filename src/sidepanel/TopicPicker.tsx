@@ -35,7 +35,7 @@ export default function TopicPicker({ topics, selected, onChange }: Props) {
         onChange={(e) => setQuery(e.target.value)}
       />
       <div className="chips">
-        {visible.map(({ topic, count }) => (
+        {visible.map(({ topic }) => (
           <button
             key={topic}
             type="button"
@@ -43,7 +43,7 @@ export default function TopicPicker({ topics, selected, onChange }: Props) {
             aria-pressed={selected.includes(topic)}
             onClick={() => toggle(topic)}
           >
-            {topic} <span className="muted">{count}</span>
+            {topic}
           </button>
         ))}
         {visible.length === 0 && <span className="muted">No topics match “{query}”.</span>}

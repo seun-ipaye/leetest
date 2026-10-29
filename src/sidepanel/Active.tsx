@@ -95,36 +95,12 @@ export default function Active({ session }: { session: Session }) {
       )}
 
       <div className="problem">
-        <span className={`badge ${problem.difficulty.toLowerCase()}`}>{problem.difficulty}</span>
-        <h2 className="title">
-          {problem.id}. {problem.title}
-        </h2>
-        {!isOA && <p className="muted tags">{problem.tags.join(" · ")}</p>}
-        <button type="button" className="link" onClick={() => act("REOPEN_PROBLEM")}>
-          Reopen problem
-        </button>
+        <h2 className="title">{problem.id}</h2>
       </div>
 
-      {!isOA && (
-        <div className="verdict">
-          {lastVerdict ? (
-            <p className={lastVerdict.verdict === "Accepted" ? "ok" : "error"}>
-              {lastVerdict.verdict}
-              {lastVerdict.runtime && <span className="muted"> · {lastVerdict.runtime}</span>}
-              {lastVerdict.memory && <span className="muted"> · {lastVerdict.memory}</span>}
-            </p>
-          ) : (
-            <p className="muted">Submit on LeetCode. Your verdict shows up here.</p>
-          )}
-          {session.currentSubmissions.length > 1 && (
-            <p className="muted hint">{session.currentSubmissions.length} submissions</p>
-          )}
-        </div>
-      )}
-
-      {isOA && (
-        <p className="muted hint">
-          Submitting moves you to the next question. Results come at the end.
+      {!isOA && lastVerdict && (
+        <p className={`verdict ${lastVerdict.verdict === "Accepted" ? "ok" : "error"}`}>
+          {lastVerdict.verdict}
         </p>
       )}
 
@@ -148,7 +124,6 @@ export default function Active({ session }: { session: Session }) {
           End
         </button>
       </div>
-      {!isOA && !nextUnlocked && <p className="muted hint">Get Accepted to unlock Next.</p>}
     </div>
   );
 }

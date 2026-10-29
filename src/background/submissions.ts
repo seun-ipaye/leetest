@@ -1,7 +1,8 @@
 import type { Submission, Verdict } from "../shared/types";
 
 // LeetCode judges a submit asynchronously: the page polls
-// https://leetcode.com/submissions/detail/<id>/check/ until `state` is "SUCCESS".
+// https://leetcode.com/submissions/detail/<id>/v2/check/ (older: .../<id>/check/) until
+// `state` is "SUCCESS".
 // "Run" uses the same endpoint with ids like "runcode_…", which we ignore.
 
 export const CHECK_URL_PATTERN = "https://leetcode.com/submissions/detail/*/check/*";
@@ -18,7 +19,7 @@ const VERDICTS: readonly Verdict[] = [
 
 /** The submission id in a check URL, or null for Run requests and anything else. */
 export function submissionIdFromUrl(url: string): string | null {
-  const match = /\/submissions\/detail\/([^/]+)\/check\/?/.exec(url);
+  const match = /\/submissions\/detail\/([^/]+)\/(?:v\d+\/)?check\/?/.exec(url);
   return match && /^\d+$/.test(match[1]) ? match[1] : null;
 }
 
@@ -45,8 +46,11 @@ export function parseCheck(body: CheckResponse, slug: string, now: number): Subm
   return {
     slug,
     verdict,
-    runtime: body.status_runtime || undefined,
-    memory: body.status_memory || undefined,
+    runtime: stat(body.status_runtime),
+    memory: stat(body.status_memory),
     submittedAt: now,
   };
 }
+
+/** LeetCode reports "N/A" for runtime and memory when a submission doesn't finish. */
+const stat = (value: string | undefined) => (value && value !== "N/A" ? value : undefined);

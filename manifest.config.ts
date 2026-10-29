@@ -10,5 +10,19 @@ export default defineManifest({
   host_permissions: ["https://leetcode.com/*"],
   background: { service_worker: "src/background/service-worker.ts", type: "module" },
   side_panel: { default_path: "src/sidepanel/index.html" },
-  action: { default_title: "Open LeetTest" },
+  icons: {
+    16: "icons/icon-16.png",
+    32: "icons/icon-32.png",
+    48: "icons/icon-48.png",
+    128: "icons/icon-128.png",
+  },
+  action: {
+    default_title: "Open LeetTest",
+    default_icon: {
+      16: "icons/icon-16.png",
+      32: "icons/icon-32.png",
+      48: "icons/icon-48.png",
+      128: "icons/icon-128.png",
+    },
+  },
 });
